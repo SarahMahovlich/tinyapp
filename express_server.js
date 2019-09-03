@@ -8,7 +8,7 @@ app.set("view engine", "ejs");
 
 //body-parser middleware is needed to make POST human-readable
 const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -17,26 +17,25 @@ const urlDatabase = {
 
 //res.render will load an ejs view file
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
+//browse
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = {urls: urlDatabase};
   res.render("urls_index", templateVars);
 });
 
+//add
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = { urlDatabase };
+  res.render("urls_new", templateVars);
 });
 
 app.post("/urls", (req, res) => {
   let shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL;
-  console.log(urlDatabase);  // Logged the POST request body to the console, now the updated object
   res.redirect(`/urls/${shortURL}`); // redirecting to shortURL page
 });
 
+//read
 app.get("/urls/:shortURL", (req, res) => {
   let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
   res.render("urls_show", templateVars);
@@ -47,9 +46,23 @@ app.get("/u/:shortURL", (req, res) => {
   res.redirect(longURL);
 });
 
+// edit
+app.post("/urls/:shortURL", (req, res) => {
+  const newLongURL = req.body.newLongURL;
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = newLongURL;
+  res.redirect(`/urls/`);
+});
+
+//delete
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect('/urls');
+});
+
+//will redirect user for any other URL they try to use
+app.get("/*", (req, res) => {
+  res.redirect("/urls");
 });
 
 app.listen(PORT, () => {
