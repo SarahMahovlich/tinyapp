@@ -43,7 +43,13 @@ app.get("/urls", (req, res) => {
 //add
 app.get("/urls/new", (req, res) => {
   let templateVars = { urlDatabase, user: users[req.cookies.user_id] };
-  res.render("urls_new", templateVars);
+
+   if (req.cookies['user_id']) {
+    res.render("urls_new", templateVars);
+  } else {
+    res.render("login_page", templateVars);
+  }
+
 });
 
 app.post("/urls", (req, res) => {
