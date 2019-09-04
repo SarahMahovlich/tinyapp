@@ -78,10 +78,23 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 });
 
 //login
+app.get("/login", (req, res) => {
+  let templateVars = {urls: urlDatabase, user: users[req.cookies.user_id] };
+  res.render("login_page", templateVars);
+})
+
+
 app.post("/login", (req, res) => {
-  const username = req.body.username;
-  res.cookie('username', username);
-  res.redirect('/urls');
+  const email = req.body.email;
+  const password = req.body.password;
+  const user = emailLookup(email);
+  const id = user.id;
+  if (user !== undefined && user.password === password) {
+    res.cookie('user_id', id);
+    res.redirect('/urls');
+  } else {
+    res.send("Status Code: 403");
+  }
 });
 
 //logout
@@ -100,8 +113,9 @@ app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  
   //if registration errors, else continue with registration
-  if(emailLookup(email) || email === "" || password === ""){ 
+  if (emailLookup(email) !== undefined || email === "" || password === ""){ 
     res.send("Status Code: 400")
   } else {
     users[id] = {
@@ -133,11 +147,13 @@ const generateRandomString = function() {
 };
 
 const emailLookup = function (emailNew) {
-  inUse = false;
-    for(const item in users) {
-      if (users[item]["email"] === emailNew) {
-        return inUse = true;
+    for(const user in users) {
+      if (users[user]["email"] === emailNew) {
+        return users[user];
       }
     }
-    return inUse;
+    return undefined;
   };
+
+
+  
