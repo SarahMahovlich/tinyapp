@@ -100,13 +100,18 @@ app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
-  users[id] = {
-    id,
-    email,
-    password
-  };
-  res.cookie('user_id', id);
-  res.redirect("/urls");  
+  //if registration errors, else continue with registration
+  if(emailLookup(email) || email === "" || password === ""){ 
+    res.send("Status Code: 400")
+  } else {
+    users[id] = {
+      id,
+      email,
+      password
+    };
+    res.cookie('user_id', id);
+    res.redirect("/urls");
+  }   
 });
 
 // will redirect user for any other URL they try to use
@@ -127,3 +132,12 @@ const generateRandomString = function() {
   return shortURL;
 };
 
+const emailLookup = function (emailNew) {
+  inUse = false;
+    for(const item in users) {
+      if (users[item]["email"] === emailNew) {
+        return inUse = true;
+      }
+    }
+    return inUse;
+  };
