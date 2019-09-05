@@ -26,6 +26,9 @@ app.use(cookieSession({
 //bcrypt for storing passwords
 const bcrypt = require('bcrypt');
 
+//helper functions
+const { getUserByEmail, generateRandomString, urlsForUser } = require ('./helper');
+
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
   "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID" },
@@ -147,7 +150,7 @@ app.get("/login", (req, res) => {
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
-  const user = emailLookup(email);
+  const user = getUserByEmail(email, users);
   const id = user.id;
   if (user !== undefined && bcrypt.compareSync(password, user.password,)) {
     req.session['user_id'] = id;
@@ -176,7 +179,7 @@ app.post("/register", (req, res) => {
   const password = bcrypt.hashSync(pass, 10); //hashed
   
   //if registration errors, else continue with registration
-  if (emailLookup(email) !== undefined || email === "" || password === ""){ 
+  if (getUserByEmail(email, users) !== undefined || email === "" || password === ""){ 
     res.send("Status Code: 400")
   } else {
     users[id] = {
@@ -198,40 +201,6 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
-//generate random string for short URL and registering new user id
-const generateRandomString = function() {
-  let shortURL = "";
-  let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < 6; i++) {
-    shortURL += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return shortURL;
-};
-
-//determine if email has already been created
-const emailLookup = function (emailNew) {
-    for(const user in users) {
-      if (users[user]["email"] === emailNew) {
-        return users[user];
-      }
-    }
-    return undefined;
-  };
-
-//filter database 
-const urlsForUser = function (object, id) {
-  let filteredUrlDatabase = {}
-    for (const item in object) {
-      if (object[item]["userID"] === id) {
-  
-        filteredUrlDatabase[item] = {
-          longURL: object[item]["longURL"],
-          userID: object[item]["userID"]
-        };
-      }
-    }
-    return filteredUrlDatabase;  
-  };
   
 
   
