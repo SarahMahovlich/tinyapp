@@ -13,27 +13,10 @@
     </header>
 
     <% if(user){ %>
-      <% if(hasUrl){ %>
-      <div class="card text-center">
-          <div class="card-header"></div>
-          <div class="card-body">
-            <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-            <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
-          </div>
-        <div class="card-footer text-muted">
-          <h3>Edit</h3>
-            <form method="POST" action="/urls/<%= shortURL %>">
-              <label for="new-name" >New URL:</label>
-              <input id="new-name" name="newLongURL" value="<%= longURL %>">
-              <button class="btn btn-primary" type="submit">SUBMIT</button>
-            </form>
-        </div>
-      </div>
-      <% } else{ %> 
-        <p>URL does not exist or does not belong to you!</p>
-        <% } %>  
+      <p>URL does not exist!</p>
+       
     <% } else{ %>  
-      <p><a href="/login>">Login</a> or <a href="/register">Register</a> to utilize TinyApp</p>
+      <p>URL does not exist! <a href="/login>">Login</a> or <a href="/register">Register</a> to utilize TinyApp!</p>
     <% } %>  
      
   

@@ -14,8 +14,8 @@
         <% include ./partials/_header %>
     </header>
   <main style="margin: 1em;">
-    <h3>My URLs</h3>
     <% if(user){ %>
+      <h3>My URLs</h3>
       <table class="table">
           <thead>
             <tr>
@@ -42,8 +42,9 @@
             <% } %>
           </tbody>
         </table>
+        <a href="/urls/new">Create a New Short Link</a>
     <% } else{ %>  
-      <p>Login or Register to View URLs</p>
+      <p><a href="/login>">Login</a> or <a href="/register">Register</a> to utilize TinyApp!</p>
     <% } %>   
   </main>
   <!-- Bootstrap JS -->
