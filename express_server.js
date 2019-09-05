@@ -87,22 +87,42 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL]['longURL'];
   res.redirect(longURL);
 });
 
 // edit
 app.post("/urls/:shortURL", (req, res) => {
-  const newLongURL = req.body.newLongURL;
-  const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = newLongURL;
-  res.redirect(`/urls/`);
+  if (req.cookies['user_id']) {
+    let filteredURLs = urlsForUser(urlDatabase, req.cookies.user_id);
+    const hasUrl = Object.keys(filteredURLs).includes(req.params.shortURL);
+    if (hasUrl()) {
+      const newLongURL = req.body.newLongURL;
+      const shortURL = req.params.shortURL;
+      urlDatabase[shortURL] = newLongURL;
+      res.redirect(`/urls/`);
+    } else {
+      console.log(Error);
+    } 
+  } else {
+    res.redirect('/login');
+  }
 });
 
 //delete
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect('/urls');
+  if (req.cookies['user_id']) {
+    let filteredURLs = urlsForUser(urlDatabase, req.cookies.user_id);
+    const hasUrl = Object.keys(filteredURLs).includes(req.params.shortURL);
+    if (hasUrl()) {  
+    delete urlDatabase[req.params.shortURL];
+    res.redirect('/urls');
+    } else {
+      console.log(Error);
+    }
+  } else {
+    res.redirect('/login');
+  }
 });
 
 //login
@@ -199,4 +219,6 @@ const urlsForUser = function (object, id) {
     }
     return filteredUrlDatabase;  
   };
+  
+
   
