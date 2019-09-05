@@ -1,6 +1,8 @@
-//things to load
+//utilizing express
 const express = require("express");
 const app = express();
+
+//port
 const PORT = 8080; // default port 8080
 
 //view engine set to ejs
@@ -13,6 +15,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //cookie-parser
 const cookieParser = require('cookie-parser');
 app.use(cookieParser());
+
+//bcrypt for storing passwords
+const bcrypt = require('bcrypt');
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
@@ -137,7 +142,7 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
   const user = emailLookup(email);
   const id = user.id;
-  if (user !== undefined && user.password === password) {
+  if (user !== undefined && bcrypt.compareSync(password, user.password,)) {
     res.cookie('user_id', id);
     res.redirect('/urls');
   } else {
@@ -160,7 +165,8 @@ app.get("/register", (req, res) => {
 app.post("/register", (req, res) => {
   const id = generateRandomString();
   const email = req.body.email;
-  const password = req.body.password;
+  const pass = req.body.password;
+  const password = bcrypt.hashSync(pass, 10); //hashed
   
   //if registration errors, else continue with registration
   if (emailLookup(email) !== undefined || email === "" || password === ""){ 
