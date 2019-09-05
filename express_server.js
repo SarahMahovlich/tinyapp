@@ -16,14 +16,15 @@ app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": { longURL: "http://www.lighthouselabs.ca", userID: "userRandomID" },
-  "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID" }
+  "9sm5xK": { longURL: "http://www.google.com", userID: "userRandomID" },
+  "9Hjsw3": { longURL: "http://www.notgoogle.com", userID: "userRandom" }
 };
 
 const users = { 
   "userRandomID": {
     id: "userRandomID", 
     email: "user@example.com", 
-    password: "purple-monkey-dinosaur"
+    password: "password"
   },
  "user2RandomID": {
     id: "user2RandomID", 
@@ -36,7 +37,8 @@ const users = {
 
 //browse
 app.get("/urls", (req, res) => {
-  let templateVars = {urls: urlDatabase, user: users[req.cookies.user_id] };
+  let filteredURLs = urlsForUser(urlDatabase, req.cookies.user_id)
+  let templateVars = {urls: filteredURLs, user: users[req.cookies.user_id] };
   res.render("urls_index", templateVars);
 });
 
@@ -64,8 +66,24 @@ app.post("/urls", (req, res) => {
 
 //read
 app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL], user: users[req.cookies.user_id] };
-  res.render("urls_show", templateVars);
+  if (!req.cookies['user_id']) {
+    let templateVars = { shortURL: req.params.shortURL, user: users[req.cookies.user_id], urls: urlDatabase}
+    res.render("urls_show", templateVars);
+  }
+  
+  let filteredURLs = urlsForUser(urlDatabase, req.cookies.user_id);
+  const hasUrl = Object.keys(filteredURLs).includes(req.params.shortURL);
+
+  if (req.cookies['user_id']) {
+    if (hasUrl) {
+      let templateVars = { shortURL: req.params.shortURL, longURL: filteredURLs[req.params.shortURL]['longURL'], user: users[req.cookies.user_id], hasUrl: hasUrl, urls: urlDatabase };
+      res.render("urls_show", templateVars);
+    } else {
+      let templateVars = { shortURL: req.params.shortURL, user: users[req.cookies.user_id], hasUrl: hasUrl, urls: urlDatabase };
+      res.render("urls_show", templateVars);
+    }
+  }
+  
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -147,6 +165,7 @@ app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//generate random string for short URL and registering new user id
 const generateRandomString = function() {
   let shortURL = "";
   let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -156,6 +175,7 @@ const generateRandomString = function() {
   return shortURL;
 };
 
+//determine if email has already been created
 const emailLookup = function (emailNew) {
     for(const user in users) {
       if (users[user]["email"] === emailNew) {
@@ -165,5 +185,18 @@ const emailLookup = function (emailNew) {
     return undefined;
   };
 
-
+//filter database 
+const urlsForUser = function (object, id) {
+  let filteredUrlDatabase = {}
+    for (const item in object) {
+      if (object[item]["userID"] === id) {
+  
+        filteredUrlDatabase[item] = {
+          longURL: object[item]["longURL"],
+          userID: object[item]["userID"]
+        };
+      }
+    }
+    return filteredUrlDatabase;  
+  };
   
