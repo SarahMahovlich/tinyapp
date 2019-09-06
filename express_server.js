@@ -50,14 +50,14 @@ const users = {
 //ROUTES
 //res.render will load ejs view files
 
-//browse
+//browse URLs
 app.get("/urls", (req, res) => {
   let filteredURLs = urlsForUser(urlDatabase, req.session.user_id);
   let templateVars = {urls: filteredURLs, user: users[req.session.user_id] };
   res.render("urls_index", templateVars);
 });
 
-//add
+//add URL
 app.get("/urls/new", (req, res) => {
   let templateVars = { urlDatabase, user: users[req.session.user_id] };
 
@@ -83,7 +83,7 @@ app.post("/urls", (req, res) => {
   }
 });
 
-//read
+//read URL
 app.get("/urls/:shortURL", (req, res) => {
   if (!req.session['user_id']) {
     let templateVars = { shortURL: req.params.shortURL, user: users[req.session.user_id] };
@@ -113,7 +113,7 @@ app.get("/u/:shortURL", (req, res) => {
   }
 });
 
-//edit
+//edit URL
 app.post("/urls/:shortURL", (req, res) => {
   if (req.session['user_id']) {
     let filteredURLs = urlsForUser(urlDatabase, req.session.user_id);
@@ -135,7 +135,7 @@ app.post("/urls/:shortURL", (req, res) => {
   }
 });
 
-//delete
+//delete URL
 app.post("/urls/:shortURL/delete", (req, res) => {
   if (req.session['user_id']) {
     let filteredURLs = urlsForUser(urlDatabase, req.session.user_id);
@@ -215,7 +215,7 @@ app.post("/register", (req, res) => {
   }
 });
 
-// will redirect user for any other URL they try to use
+// redirect user for any other URL
 app.get("/*", (req, res) => {
   if (req.session['user_id']) {
     res.redirect("/urls");
