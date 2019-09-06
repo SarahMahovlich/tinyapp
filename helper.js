@@ -1,6 +1,6 @@
 //determine if email has already been created, then return user OR return undefined with registering
-const getUserByEmail = function (emailNew, database) {
-  for(const user in database) {
+const getUserByEmail = function(emailNew, database) {
+  for (const user in database) {
     if (database[user]["email"] === emailNew) {
       return database[user];
     }
@@ -18,19 +18,18 @@ const generateRandomString = function() {
   return shortURL;
 };
 
-//filter database 
-const urlsForUser = function (object, id) {
-  let filteredUrlDatabase = {}
-    for (const item in object) {
-      if (object[item]["userID"] === id) {
-  
-        filteredUrlDatabase[item] = {
-          longURL: object[item]["longURL"],
-          userID: object[item]["userID"]
-        };
-      }
+//filter database
+const urlsForUser = function(object, id) {
+  let filteredUrlDatabase = {};
+  for (const item in object) {
+    if (object[item]["userID"] === id) {
+      filteredUrlDatabase[item] = {
+        longURL: object[item]["longURL"],
+        userID: object[item]["userID"]
+      };
     }
-    return filteredUrlDatabase;  
-  };
+  }
+  return filteredUrlDatabase;
+};
 
-module.exports = { getUserByEmail, generateRandomString, urlsForUser }
+module.exports = { getUserByEmail, generateRandomString, urlsForUser };
